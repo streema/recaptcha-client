@@ -44,7 +44,7 @@ def displayhtml (public_key,
 def submit (recaptcha_challenge_field,
             recaptcha_response_field,
             private_key,
-            remoteip):
+            remoteip, proxy=None):
     """
     Submits a reCAPTCHA request for verification. Returns RecaptchaResponse
     for the request
@@ -81,7 +81,14 @@ def submit (recaptcha_challenge_field,
             }
         )
     
-    httpresp = urllib2.urlopen (request)
+    if not proxy:
+        httpresp = urllib2.urlopen (request)
+    else:
+        opener = urllib2.build_opener(
+            urllib2.HTTPHandler(),
+            urllib2.HTTPSHandler(),
+            urllib2.ProxyHandler({'https': 'http://'+proxy, 'http': 'http://'+proxy}))
+        httpresp = opener.open(request);
 
     return_values = httpresp.read ().splitlines ();
     httpresp.close();
