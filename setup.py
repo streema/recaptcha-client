@@ -6,7 +6,7 @@ except ImportError:
     from setuptools import setup, find_packages
 
 setup(name='recaptcha-client',
-      version='1.0.6',
+      version='2.0.0',
       url = "http://recaptcha.net",
       author = "Ben Maurer",
       author_email = "support@recaptcha.net",
