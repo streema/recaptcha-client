@@ -1,4 +1,4 @@
-import urllib2, urllib
+import urllib.request, urllib.parse
 
 API_SSL_SERVER="https://www.google.com/recaptcha/api"
 API_SERVER="http://www.google.com/recaptcha/api"
@@ -61,20 +61,20 @@ def submit (recaptcha_challenge_field,
     
 
     def encode_if_necessary(s):
-        if isinstance(s, unicode):
+        if isinstance(s, str):
             return s.encode('utf-8')
         return s
 
-    params = urllib.urlencode ({
+    params = urllib.parse.urlencode ({
             'privatekey': encode_if_necessary(private_key),
             'remoteip' :  encode_if_necessary(remoteip),
             'challenge':  encode_if_necessary(recaptcha_challenge_field),
             'response' :  encode_if_necessary(recaptcha_response_field),
             })
 
-    request = urllib2.Request (
+    request = urllib.request.Request (
         url = "http://%s/recaptcha/api/verify" % VERIFY_SERVER,
-        data = params,
+        data = params.encode('utf-8'),
         headers = {
             "Content-type": "application/x-www-form-urlencoded",
             "User-agent": "reCAPTCHA Python"
@@ -82,20 +82,20 @@ def submit (recaptcha_challenge_field,
         )
     
     if not proxy:
-        httpresp = urllib2.urlopen (request)
+        httpresp = urllib.request.urlopen (request)
     else:
-        opener = urllib2.build_opener(
-            urllib2.HTTPHandler(),
-            urllib2.HTTPSHandler(),
-            urllib2.ProxyHandler({'https': 'http://'+proxy, 'http': 'http://'+proxy}))
+        opener = urllib.request.build_opener(
+            urllib.request.HTTPHandler(),
+            urllib.request.HTTPSHandler(),
+            urllib.request.ProxyHandler({'https': 'http://'+proxy, 'http': 'http://'+proxy}))
         httpresp = opener.open(request);
 
-    return_values = httpresp.read ().splitlines ();
-    httpresp.close();
+    return_values = httpresp.read().splitlines()
+    httpresp.close()
 
-    return_code = return_values [0]
+    return_code = return_values[0].decode()
 
     if (return_code == "true"):
         return RecaptchaResponse (is_valid=True)
     else:
-        return RecaptchaResponse (is_valid=False, error_code = return_values [1])
+        return RecaptchaResponse (is_valid=False, error_code = return_values[1].decode())
